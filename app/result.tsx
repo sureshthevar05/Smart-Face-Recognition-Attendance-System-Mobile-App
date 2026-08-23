@@ -92,7 +92,7 @@ function AnnotatedImage({ images }: { images: string[] }) {
   );
 }
 
-function PendingReviewList({ items, onResolve }: { items: PendingReviewItem[]; onResolve: (id: string, accept: boolean) => void }) {
+function PendingReviewList({ items, onResolve }: { items: PendingReviewItem[]; onResolve: (item: PendingReviewItem, accept: boolean) => void }) {
   if (!items || items.length === 0) return null;
   return (
     <View className="rounded-2xl border border-brand-blue/20 bg-[#F4F7FB] p-5 mb-8">
@@ -106,13 +106,13 @@ function PendingReviewList({ items, onResolve }: { items: PendingReviewItem[]; o
           <Image source={{ uri: resolveMediaUrl(item.image_url) }} className="h-12 w-12 rounded-lg mr-3 bg-surface" />
           <View className="flex-1">
             <Text className="text-sm font-bold text-navy">{item.display_name}</Text>
-            <Text className="text-xs text-brand-blue mt-0.5">Similarity: {(item.similarity * 100).toFixed(1)}%</Text>
+            <Text className="text-xs text-brand-blue mt-0.5">Similarity: {item.similarity.toFixed(1)}%</Text>
           </View>
           <View className="flex-row gap-3 mr-1">
-            <TouchableOpacity onPress={() => onResolve(item.id, false)} className="h-8 w-8 items-center justify-center">
+            <TouchableOpacity onPress={() => onResolve(item, false)} className="h-8 w-8 items-center justify-center">
               <Ionicons name="close" size={20} color="#1F2937" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => onResolve(item.id, true)} className="h-8 w-8 items-center justify-center rounded-full bg-success/20">
+            <TouchableOpacity onPress={() => onResolve(item, true)} className="h-8 w-8 items-center justify-center rounded-full bg-success/20">
               <Ionicons name="checkmark" size={18} color="#16A34A" />
             </TouchableOpacity>
           </View>
@@ -202,11 +202,15 @@ export default function ResultScreen() {
     router.push("/start-attendance");
   }
 
-  function handleResolvePending(id: string, accept: boolean) {
-    setResolvedReviews(prev => new Set(prev).add(id));
+  function handleResolvePending(item: PendingReviewItem, accept: boolean) {
+    setResolvedReviews(prev => new Set(prev).add(item.id));
     if (accept) {
-      // In a real app we'd mark them as present if we accept
-      // This is a UI mock so we just hide it for now
+      const record = effectiveAttendance.find(r => r.student_id === item.student_id);
+      if (record && record.status !== 'present') {
+        toggleStatus(item.student_id);
+        setToastMessage(`${item.display_name} has been marked present.`);
+        setTimeout(() => setToastMessage(null), 3000);
+      }
     }
   }
 
