@@ -1,4 +1,4 @@
-export interface LoginCredentials {
+﻿export interface LoginCredentials {
   username: string;
   password: string;
   rememberMe: boolean;
@@ -9,6 +9,7 @@ export interface AuthUser {
   fullName: string;
   department: string;
   gender?: string | null;
+  isAdmin: boolean;
 }
 
 export interface LoginResponse {
@@ -17,4 +18,5 @@ export interface LoginResponse {
   full_name: string;
   department: string;
   gender?: string | null;
+  is_admin?: boolean;
 }

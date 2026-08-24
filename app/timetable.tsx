@@ -71,6 +71,7 @@ export default function TimetableScreen() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { setSelectedSlot } = useAttendanceFlow();
+  const { scheduleClassNotifications } = require('../src/hooks/useNotifications').useTimetableNotifications();
 
   const [data, setData] = useState<TimetableResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -83,6 +84,9 @@ export default function TimetableScreen() {
     try {
       const res = await getTimetable({ facultyId: user.facultyId });
       setData(res);
+      if (res && res.timetable) {
+        scheduleClassNotifications(res.timetable);
+      }
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message);

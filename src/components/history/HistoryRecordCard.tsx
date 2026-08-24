@@ -4,11 +4,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import type { AttendanceHistoryRecord } from "../../types/history";
 
-function StatusBadge({ status }: { status: string }) {
-  const isCompleted = status.toLowerCase() === "completed";
+function StatusBadge({ status }: { status?: string }) {
+  const isCompleted = (status || "").toLowerCase() === "completed";
   return (
     <View
-      className={"shrink-0 rounded-full px-2.5 py-1 "}
+      className={`shrink-0 rounded-full px-2.5 py-1 ${
+        isCompleted ? "bg-success/10" : "bg-warning/10"
+      }`}
     >
       <Text
         className={"text-xs font-semibold "}

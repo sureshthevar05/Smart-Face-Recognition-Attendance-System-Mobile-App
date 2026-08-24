@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
+﻿import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "expo-router";
 import { login as loginRequest } from "../services/authService";
 import {
@@ -38,6 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           fullName: stored.fullName,
           department: stored.department,
           gender: stored.gender,
+          isAdmin: stored.isAdmin || false,
         });
       }
       setIsHydrated(true);
@@ -50,15 +51,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoginError(null);
       try {
         const data = await loginRequest(credentials);
+        const isAdmin = data.is_admin === true;
         const identity: AuthUser = {
           facultyId: data.faculty_id,
           fullName: data.full_name,
           department: data.department,
           gender: data.gender,
+          isAdmin,
         };
         await storeFacultyIdentity(identity);
         setUser(identity);
-        router.replace("/start-attendance");
+        if (isAdmin) {
+          router.replace("/(admin)/dashboard");
+        } else {
+          router.replace("/start-attendance");
+        }
       } catch (err) {
         if (err instanceof ApiError) {
           setLoginError(err.message);

@@ -89,18 +89,14 @@ export default function ReportsScreen() {
           <View className="pb-10">
             {/* Key Insights Grid */}
             <Text className="text-lg font-extrabold text-navy mb-3">Key Insights</Text>
-            <View className="flex-row flex-wrap justify-between gap-y-3 mb-6">
-              
+            <View className="flex-row justify-between mb-4">
               <View className="w-[48%] bg-white rounded-xl p-4 border border-surface-border">
                 <View className="flex-row items-center mb-1">
-                  <Ionicons name="time-outline" size={16} color="#16A34A" />
+                  <Ionicons name="time-outline" size={16} color="#10B981" />
                   <Text className="text-[10px] font-bold text-surface-muted uppercase ml-1">Time Saved</Text>
                 </View>
                 <Text className="text-lg font-extrabold text-navy">
                   {formatSeconds(data.insights.time_saved.value_seconds)}
-                </Text>
-                <Text className={`text-[10px] mt-1 ${data.insights.time_saved.trend && data.insights.time_saved.trend >= 0 ? "text-success" : "text-danger"}`}>
-                  {data.insights.time_saved.trend && data.insights.time_saved.trend >= 0 ? "↑" : "↓"} {Math.abs(data.insights.time_saved.trend || 0).toFixed(1)}% vs previous
                 </Text>
               </View>
 
@@ -112,11 +108,10 @@ export default function ReportsScreen() {
                 <Text className="text-lg font-extrabold text-navy">
                   {formatSeconds(data.insights.processing_time.value_seconds / (data.insights.total_sessions.value || 1))}
                 </Text>
-                <Text className={`text-[10px] mt-1 ${data.insights.processing_time.trend && data.insights.processing_time.trend <= 0 ? "text-success" : "text-danger"}`}>
-                  {data.insights.processing_time.trend && data.insights.processing_time.trend <= 0 ? "↓" : "↑"} {Math.abs(data.insights.processing_time.trend || 0).toFixed(1)}% vs previous
-                </Text>
               </View>
+            </View>
 
+            <View className="flex-row justify-between mb-6">
               <View className="w-[48%] bg-white rounded-xl p-4 border border-surface-border">
                 <View className="flex-row items-center mb-1">
                   <Ionicons name="people-outline" size={16} color="#9333EA" />
@@ -124,9 +119,6 @@ export default function ReportsScreen() {
                 </View>
                 <Text className="text-lg font-extrabold text-navy">
                   {data.insights.overall_attendance.value_percentage.toFixed(1)}%
-                </Text>
-                <Text className={`text-[10px] mt-1 ${data.insights.overall_attendance.trend && data.insights.overall_attendance.trend >= 0 ? "text-success" : "text-danger"}`}>
-                  {data.insights.overall_attendance.trend && data.insights.overall_attendance.trend >= 0 ? "↑" : "↓"} {Math.abs(data.insights.overall_attendance.trend || 0).toFixed(1)}% vs previous
                 </Text>
               </View>
 
@@ -137,9 +129,6 @@ export default function ReportsScreen() {
                 </View>
                 <Text className="text-lg font-extrabold text-navy">
                   {data.insights.total_sessions.value}
-                </Text>
-                <Text className={`text-[10px] mt-1 ${data.insights.total_sessions.trend && data.insights.total_sessions.trend >= 0 ? "text-success" : "text-danger"}`}>
-                  {data.insights.total_sessions.trend && data.insights.total_sessions.trend >= 0 ? "↑" : "↓"} {Math.abs(data.insights.total_sessions.trend || 0).toFixed(1)}% vs previous
                 </Text>
               </View>
 

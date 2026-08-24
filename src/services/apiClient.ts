@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosHeaders } from "axios";
+﻿import axios, { AxiosError, AxiosHeaders } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Replace with your local IP address for device testing
@@ -11,6 +11,7 @@ export interface StoredFacultyIdentity {
   fullName: string;
   department: string;
   gender?: string | null;
+  isAdmin?: boolean;
 }
 
 export async function getStoredFacultyIdentity(): Promise<StoredFacultyIdentity | null> {
@@ -117,3 +118,4 @@ apiClient.interceptors.response.use(
     );
   }
 );
+
