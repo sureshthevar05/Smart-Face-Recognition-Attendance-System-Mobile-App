@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { View, Text, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppFooter } from "../src/components/layout/AppFooter";
@@ -6,6 +6,7 @@ import { Card } from "../src/components/ui/Card";
 import { Input } from "../src/components/ui/Input";
 import { Button } from "../src/components/ui/Button";
 import { useAuth } from "../src/context/AuthContext";
+import { useRouter } from "expo-router";
 import { HindustanLogo, HindustanBadge40 } from "../src/components/layout/HindustanBrandmark";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -14,6 +15,7 @@ export default function LoginScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   const handleLogin = () => {
     if (!username || !password) return;
@@ -107,7 +109,7 @@ export default function LoginScreen() {
                 Sign In
               </Button>
               
-              <TouchableOpacity className="mt-6 items-center">
+              <TouchableOpacity className="mt-6 items-center" onPress={() => router.push("/forgot-password")}>
                 <Text className="text-brand-blue font-bold text-sm">Forgot Password?</Text>
               </TouchableOpacity>
             </Card>
@@ -152,3 +154,4 @@ export default function LoginScreen() {
     </View>
   );
 }
+

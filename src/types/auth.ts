@@ -14,9 +14,12 @@ export interface AuthUser {
 
 export interface LoginResponse {
   success: true;
+  access: string;
+  refresh: string;
   faculty_id: string;
   full_name: string;
   department: string;
   gender?: string | null;
   is_admin?: boolean;
 }
+

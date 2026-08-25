@@ -2,6 +2,8 @@
 import { useRouter } from "expo-router";
 import { login as loginRequest } from "../services/authService";
 import {
+  storeTokens,
+  clearTokens,
   clearStoredFacultyIdentity,
   getStoredFacultyIdentity,
   storeFacultyIdentity,
@@ -52,6 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const data = await loginRequest(credentials);
         const isAdmin = data.is_admin === true;
+        await storeTokens(data.access, data.refresh);
         const identity: AuthUser = {
           facultyId: data.faculty_id,
           fullName: data.full_name,
@@ -80,6 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const logout = useCallback(async () => {
+    await clearTokens();
     await clearStoredFacultyIdentity();
     setUser(null);
     router.replace("/login");
@@ -107,3 +111,4 @@ export function useAuth() {
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
 }
+

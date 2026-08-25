@@ -1,10 +1,31 @@
-﻿import axios, { AxiosError, AxiosHeaders } from "axios";
+import axios, { AxiosError, AxiosHeaders } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 
 // Replace with your local IP address for device testing
 export const API_BASE_URL = "http://172.20.10.2:8000";
 
 const FACULTY_STORAGE_KEY = "hsfas_faculty_identity";
+const JWT_ACCESS_KEY = "hsfas_jwt_access";
+const JWT_REFRESH_KEY = "hsfas_jwt_refresh";
+
+export async function storeTokens(access: string, refresh: string) {
+  await SecureStore.setItemAsync(JWT_ACCESS_KEY, access);
+  await SecureStore.setItemAsync(JWT_REFRESH_KEY, refresh);
+}
+
+export async function getAccessToken() {
+  return await SecureStore.getItemAsync(JWT_ACCESS_KEY);
+}
+
+export async function getRefreshToken() {
+  return await SecureStore.getItemAsync(JWT_REFRESH_KEY);
+}
+
+export async function clearTokens() {
+  await SecureStore.deleteItemAsync(JWT_ACCESS_KEY);
+  await SecureStore.deleteItemAsync(JWT_REFRESH_KEY);
+}
 
 export interface StoredFacultyIdentity {
   facultyId: string;
@@ -62,9 +83,13 @@ export const apiClient = axios.create({
   timeout: 120000, 
 });
 
-apiClient.interceptors.request.use((config) => {
+apiClient.interceptors.request.use(async (config) => {
   if (config.data instanceof FormData && config.headers) {
-    config.headers.delete("Content-Type"); // let axios/fetch set it with boundary
+    config.headers.delete("Content-Type"); 
+  }
+  const token = await getAccessToken();
+  if (token && config.headers) {
+    config.headers.set("Authorization", `Bearer ${token}`);
   }
   return config;
 });
@@ -118,4 +143,5 @@ apiClient.interceptors.response.use(
     );
   }
 );
+
 
