@@ -11,8 +11,12 @@ export async function processAttendance(
 ): Promise<AttendanceResponse> {
   const formData = new FormData();
   payload.images.forEach((asset) => {
-    // React Native needs { uri, name, type } appended for files
     formData.append("images", asset as any);
+    if (asset.captureTime) {
+      formData.append("capture_times", asset.captureTime);
+    } else {
+      formData.append("capture_times", "MISSING");
+    }
   });
   formData.append("timetable_slot_id", String(payload.timetableSlotId));
   formData.append("date", payload.date);

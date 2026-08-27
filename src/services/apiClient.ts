@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 
 // Replace with your local IP address for device testing
-export const API_BASE_URL = "http://13.49.227.175:8000";
+export const API_BASE_URL = "http://172.20.10.2:8000";
 
 const FACULTY_STORAGE_KEY = "hsfas_faculty_identity";
 const JWT_ACCESS_KEY = "hsfas_jwt_access";

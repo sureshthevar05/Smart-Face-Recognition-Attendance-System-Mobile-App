@@ -17,6 +17,41 @@ const INSTRUCTIONS = [
   'Click "Process Attendance" after preview',
 ];
 
+function parseExifDate(exifString: string): Date | null {
+  if (!exifString) return null;
+  const parts = exifString.split(" ");
+  if (parts.length !== 2) return null;
+  const [y, m, d] = parts[0].split(":");
+  const [H, M, S] = parts[1].split(":");
+  if (!y || !m || !d || !H || !M || !S) return null;
+  return new Date(parseInt(y), parseInt(m) - 1, parseInt(d), parseInt(H), parseInt(M), parseInt(S));
+}
+
+function parseSlotTimeBounds(timeString: string): { start: Date, end: Date } | null {
+  if (!timeString) return null;
+  const parts = timeString.split("-").map(s => s.trim());
+  if (parts.length !== 2) return null;
+  
+  const parseTime = (tStr: string) => {
+    const match = tStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!match) return null;
+    let [_, h, m, ampm] = match;
+    let hours = parseInt(h, 10);
+    const mins = parseInt(m, 10);
+    if (ampm.toUpperCase() === "PM" && hours < 12) hours += 12;
+    if (ampm.toUpperCase() === "AM" && hours === 12) hours = 0;
+    
+    const d = new Date();
+    d.setHours(hours, mins, 0, 0);
+    return d;
+  };
+  
+  const start = parseTime(parts[0]);
+  const end = parseTime(parts[1]);
+  if (!start || !end) return null;
+  return { start, end };
+}
+
 export default function StartAttendanceScreen() {
   const router = useRouter();
   const { addImages, images, selectedSlot } = useAttendanceFlow();
@@ -31,19 +66,58 @@ export default function StartAttendanceScreen() {
   const handleAssets = (assets: ImagePicker.ImagePickerAsset[]) => {
     if (!assets || assets.length === 0) return;
     
+    // Front-end EXIF validation
+    const validAssets: ImagePicker.ImagePickerAsset[] = [];
+    const bounds = selectedSlot?.time ? parseSlotTimeBounds(selectedSlot.time) : null;
+    let rejectedByTime = 0;
+    let rejectedByMissingExif = 0;
+
+    for (const asset of assets) {
+      if (!asset.exif || !asset.exif.DateTimeOriginal) {
+        rejectedByMissingExif++;
+        continue;
+      }
+      if (bounds) {
+        const captureTime = parseExifDate(asset.exif.DateTimeOriginal);
+        if (!captureTime) {
+          rejectedByMissingExif++;
+          continue;
+        }
+        
+        // 15 minute tolerance
+        const minTime = new Date(bounds.start.getTime() - 15 * 60000);
+        const maxTime = new Date(bounds.end.getTime() + 15 * 60000);
+        
+        if (captureTime < minTime || captureTime > maxTime) {
+          rejectedByTime++;
+          continue;
+        }
+      }
+      validAssets.push(asset);
+    }
+
+    if (rejectedByMissingExif > 0) {
+      Alert.alert("Invalid Photo", "One or more photos were rejected because they lack original timestamp data (e.g. screenshots or WhatsApp downloads). Please use the original photo.");
+    } else if (rejectedByTime > 0) {
+      Alert.alert("Invalid Timestamp", "One or more photos were rejected because they were not taken during the scheduled class period.");
+    }
+
+    if (validAssets.length === 0) return;
+
     // Check max images logic
     const availableSlots = MAX_IMAGES - images.length;
-    const toAdd = assets.slice(0, availableSlots);
-    const rejected = assets.length - toAdd.length;
+    const toAdd = validAssets.slice(0, availableSlots);
+    const rejectedByLimit = validAssets.length - toAdd.length;
 
     addImages(toAdd.map(a => ({
       uri: a.uri,
       name: a.fileName || a.uri.split('/').pop() || "image.jpg",
-      type: a.mimeType || "image/jpeg"
+      type: a.mimeType || "image/jpeg",
+      captureTime: a.exif?.DateTimeOriginal
     })));
 
-    if (rejected > 0) {
-      setWarning(`Only ${MAX_IMAGES} images allowed. ${rejected} were omitted.`);
+    if (rejectedByLimit > 0) {
+      setWarning(`Only ${MAX_IMAGES} images allowed. ${rejectedByLimit} were omitted.`);
     } else {
       setWarning(null);
     }
@@ -65,6 +139,7 @@ export default function StartAttendanceScreen() {
       allowsMultipleSelection: true,
       selectionLimit: MAX_IMAGES - images.length,
       quality: 0.8,
+      exif: true,
     });
 
     if (!result.canceled && result.assets) {
@@ -82,6 +157,7 @@ export default function StartAttendanceScreen() {
     let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.8,
+      exif: true,
     });
 
     if (!result.canceled && result.assets) {
