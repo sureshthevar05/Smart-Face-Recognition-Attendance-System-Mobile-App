@@ -1,4 +1,4 @@
-﻿export interface LoginCredentials {
+export interface LoginCredentials {
   username: string;
   password: string;
   rememberMe: boolean;
@@ -13,13 +13,16 @@ export interface AuthUser {
 }
 
 export interface LoginResponse {
-  success: true;
+  token?: string;
   access: string;
   refresh: string;
-  faculty_id: string;
-  full_name: string;
-  department: string;
-  gender?: string | null;
-  is_admin?: boolean;
+  faculty: {
+    id?: number;
+    employee_id: string;
+    full_name: string;
+    department: string;
+    gender?: string | null;
+    is_admin?: boolean;
+  };
 }
 

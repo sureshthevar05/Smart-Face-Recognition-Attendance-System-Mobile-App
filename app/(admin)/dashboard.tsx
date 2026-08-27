@@ -69,44 +69,50 @@ export default function AdminDashboard() {
             </Card>
           ) : (
             sessions.map((session, index) => (
-              <Card key={session.session_id || index} className="mb-3 p-4 border-l-4 border-l-brand-blue">
-                <View className="flex-row justify-between items-start mb-2">
-                  <View className="flex-1 pr-2">
-                    <Text className="text-sm font-bold text-navy" numberOfLines={1}>
-                      {session.course_code} - {session.course_name}
-                    </Text>
-                    <Text className="text-xs font-semibold text-brand-blue mt-1">
-                      {session.target_department} • Year {session.target_year} • Sec {session.target_section}
-                    </Text>
-                    <Text className="text-[11px] text-surface-muted mt-0.5">
-                      By {session.faculty_name}
-                    </Text>
+              <TouchableOpacity 
+                key={session.session_id || index} 
+                onPress={() => router.push(`/history/${session.session_id}`)}
+                activeOpacity={0.7}
+              >
+                <Card className="mb-3 p-4 border-l-4 border-l-brand-blue">
+                  <View className="flex-row justify-between items-start mb-2">
+                    <View className="flex-1 pr-2">
+                      <Text className="text-sm font-bold text-navy" numberOfLines={1}>
+                        {session.course_code} - {session.course_name}
+                      </Text>
+                      <Text className="text-xs font-semibold text-brand-blue mt-1">
+                        {session.target_department} • Year {session.target_year} • Sec {session.target_section}
+                      </Text>
+                      <Text className="text-[11px] text-surface-muted mt-0.5">
+                        By {session.faculty_name}
+                      </Text>
+                    </View>
+                    <View className="bg-[#F4F7FB] px-2 py-1 rounded-md items-end">
+                      <Text className="text-[10px] font-semibold text-navy">
+                        {session.date}
+                      </Text>
+                      <Text className="text-[10px] font-bold text-brand-blue mt-0.5">
+                        Period {session.period_number}
+                      </Text>
+                    </View>
                   </View>
-                  <View className="bg-[#F4F7FB] px-2 py-1 rounded-md items-end">
-                    <Text className="text-[10px] font-semibold text-navy">
-                      {session.date}
-                    </Text>
-                    <Text className="text-[10px] font-bold text-brand-blue mt-0.5">
-                      Period {session.period_number}
-                    </Text>
+                  
+                  <View className="flex-row items-center mt-3 pt-3 border-t border-surface-border">
+                    <View className="flex-1 flex-row items-center">
+                      <View className="h-2 w-2 rounded-full bg-success mr-2" />
+                      <Text className="text-xs text-navy font-medium">{session.present} Present</Text>
+                    </View>
+                    <View className="flex-1 flex-row items-center">
+                      <View className="h-2 w-2 rounded-full bg-danger mr-2" />
+                      <Text className="text-xs text-navy font-medium">{session.absent} Absent</Text>
+                    </View>
+                    <View className="flex-1 flex-row items-center justify-end">
+                      <Ionicons name="people" size={14} color="#64748B" className="mr-1" />
+                      <Text className="text-xs text-surface-muted font-medium">{session.total_students} Total</Text>
+                    </View>
                   </View>
-                </View>
-                
-                <View className="flex-row items-center mt-3 pt-3 border-t border-surface-border">
-                  <View className="flex-1 flex-row items-center">
-                    <View className="h-2 w-2 rounded-full bg-success mr-2" />
-                    <Text className="text-xs text-navy font-medium">{session.present} Present</Text>
-                  </View>
-                  <View className="flex-1 flex-row items-center">
-                    <View className="h-2 w-2 rounded-full bg-danger mr-2" />
-                    <Text className="text-xs text-navy font-medium">{session.absent} Absent</Text>
-                  </View>
-                  <View className="flex-1 flex-row items-center justify-end">
-                    <Ionicons name="people" size={14} color="#64748B" className="mr-1" />
-                    <Text className="text-xs text-surface-muted font-medium">{session.total_students} Total</Text>
-                  </View>
-                </View>
-              </Card>
+                </Card>
+              </TouchableOpacity>
             ))
           )}
         </ScrollView>

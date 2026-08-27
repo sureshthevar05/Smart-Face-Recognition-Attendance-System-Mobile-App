@@ -13,24 +13,57 @@ import type { AttendanceRecord, PendingReviewItem } from "../src/types/attendanc
 
 const screenWidth = Dimensions.get('window').width;
 
-function SummaryCards({ present, absent }: { present: number; absent: number }) {
+function SummaryCards({ present, absent, processingTime, totalStudents }: { present: number; absent: number; processingTime?: number; totalStudents?: number }) {
+  const formatTime = (seconds: number) => {
+    if (seconds < 60) return `${seconds.toFixed(1)}s`;
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}m ${s}s`;
+  };
+
+  const timeSaved = (totalStudents && processingTime !== undefined) ? Math.max(0, (totalStudents * 6) - processingTime) : undefined;
+
   return (
-    <View className="flex-row gap-4 mb-6">
-      <View className="flex-1 rounded-2xl bg-white border border-surface-border p-4 shadow-sm items-center justify-center">
-        <View className="h-8 w-8 rounded-full bg-success/20 items-center justify-center mb-2">
-          <Ionicons name="checkmark" size={18} color="#16A34A" />
+    <View className="mb-6">
+      <View className="flex-row gap-4 mb-4">
+        <View className="flex-1 rounded-2xl bg-white border border-surface-border p-4 shadow-sm items-center justify-center">
+          <View className="h-8 w-8 rounded-full bg-success/20 items-center justify-center mb-2">
+            <Ionicons name="checkmark" size={18} color="#16A34A" />
+          </View>
+          <Text className="text-xs text-navy font-semibold mb-1">Present</Text>
+          <Text className="text-3xl font-extrabold text-success">{present}</Text>
         </View>
-        <Text className="text-xs text-navy font-semibold mb-1">Present</Text>
-        <Text className="text-3xl font-extrabold text-success">{present}</Text>
-      </View>
-      
-      <View className="flex-1 rounded-2xl bg-white border border-surface-border p-4 shadow-sm items-center justify-center">
-        <View className="h-8 w-8 rounded-full bg-danger/10 items-center justify-center mb-2">
-          <Ionicons name="person-outline" size={16} color="#DC2626" />
+        
+        <View className="flex-1 rounded-2xl bg-white border border-surface-border p-4 shadow-sm items-center justify-center">
+          <View className="h-8 w-8 rounded-full bg-danger/10 items-center justify-center mb-2">
+            <Ionicons name="person-outline" size={16} color="#DC2626" />
+          </View>
+          <Text className="text-xs text-navy font-semibold mb-1">Absent</Text>
+          <Text className="text-3xl font-extrabold text-danger">{absent}</Text>
         </View>
-        <Text className="text-xs text-navy font-semibold mb-1">Absent</Text>
-        <Text className="text-3xl font-extrabold text-danger">{absent}</Text>
       </View>
+
+      {processingTime !== undefined && (
+        <View className="flex-row gap-4">
+          <View className="flex-1 rounded-2xl bg-white border border-surface-border p-4 shadow-sm items-center justify-center">
+            <View className="h-8 w-8 rounded-full bg-brand-blue/10 items-center justify-center mb-2">
+              <Ionicons name="flash-outline" size={16} color="#2563EB" />
+            </View>
+            <Text className="text-xs text-navy font-semibold mb-1">AI Processing</Text>
+            <Text className="text-xl font-bold text-navy">{formatTime(processingTime)}</Text>
+          </View>
+          
+          {timeSaved !== undefined && (
+            <View className="flex-1 rounded-2xl bg-white border border-surface-border p-4 shadow-sm items-center justify-center">
+              <View className="h-8 w-8 rounded-full bg-success/20 items-center justify-center mb-2">
+                <Ionicons name="time-outline" size={18} color="#16A34A" />
+              </View>
+              <Text className="text-xs text-navy font-semibold mb-1">Time Saved</Text>
+              <Text className="text-xl font-bold text-success">{formatTime(timeSaved)}</Text>
+            </View>
+          )}
+        </View>
+      )}
     </View>
   );
 }
@@ -235,7 +268,12 @@ export default function ResultScreen() {
 
       <ScrollView className="flex-1 px-5 py-5 pb-32">
         
-        <SummaryCards present={presentCount} absent={absentCount} />
+        <SummaryCards 
+          present={presentCount} 
+          absent={absentCount} 
+          processingTime={result.summary.processing_time_seconds}
+          totalStudents={result.summary.total_students}
+        />
         
         <AnnotatedImage images={result.annotated_images} />
 

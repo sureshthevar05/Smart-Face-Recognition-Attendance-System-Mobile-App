@@ -16,6 +16,7 @@ export interface AttendanceSummary {
   present: number;
   absent: number;
   unknown: number;
+  processing_time_seconds?: number;
 }
 
 export interface PendingReviewItem {

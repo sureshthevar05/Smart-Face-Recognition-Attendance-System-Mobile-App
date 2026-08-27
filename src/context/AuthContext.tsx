@@ -1,4 +1,4 @@
-﻿import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "expo-router";
 import { login as loginRequest } from "../services/authService";
 import {
@@ -53,13 +53,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoginError(null);
       try {
         const data = await loginRequest(credentials);
-        const isAdmin = data.is_admin === true;
+        const isAdmin = data.faculty.is_admin === true;
         await storeTokens(data.access, data.refresh);
         const identity: AuthUser = {
-          facultyId: data.faculty_id,
-          fullName: data.full_name,
-          department: data.department,
-          gender: data.gender,
+          facultyId: data.faculty.employee_id,
+          fullName: data.faculty.full_name,
+          department: data.faculty.department,
+          gender: data.faculty.gender,
           isAdmin,
         };
         await storeFacultyIdentity(identity);

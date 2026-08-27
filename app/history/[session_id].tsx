@@ -100,6 +100,7 @@ export default function HistoryDetailScreen() {
   const { session_id } = useLocalSearchParams();
   const router = useRouter();
   const { user } = useAuth();
+  const isAdmin = user?.isAdmin === true;
   const facultyId = user?.facultyId ?? "";
 
   const [record, setRecord] = useState<AttendanceHistoryRecord | null>(null);
@@ -110,11 +111,11 @@ export default function HistoryDetailScreen() {
   const [showAllAbsent, setShowAllAbsent] = useState(false);
 
   const fetchRecord = useCallback(async () => {
-    if (!facultyId || !session_id) return;
+    if ((!facultyId && !isAdmin) || !session_id) return;
     setIsLoading(true);
     setError(null);
     try {
-      const data = await getAttendanceHistory(facultyId);
+      const data = await getAttendanceHistory(isAdmin ? undefined : facultyId);
       const found = data.find((r) => String(r.session_id) === String(session_id));
       if (found) {
         setRecord(found);
@@ -126,7 +127,7 @@ export default function HistoryDetailScreen() {
     } finally {
       setIsLoading(false);
     }
-  }, [facultyId, session_id]);
+  }, [facultyId, session_id, isAdmin]);
 
   useEffect(() => {
     fetchRecord();
