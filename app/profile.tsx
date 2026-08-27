@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
 import { AppHeader } from "../src/components/layout/AppHeader";
 import { BottomNav } from "../src/components/layout/BottomNav";
 import { useAuth } from "../src/context/AuthContext";
@@ -18,6 +19,7 @@ function getInitials(name?: string) {
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
+  const router = useRouter();
 
   // Generate a mock email if one isn't provided by the API
   const email = user?.fullName 
@@ -32,7 +34,11 @@ export default function ProfileScreen() {
         showMenu
       />
       
-      <ScrollView className="flex-1 px-5 py-5 mb-20">
+      <ScrollView 
+        className="flex-1 px-5 pt-5" 
+        contentContainerStyle={{ paddingBottom: 120 }}
+        showsVerticalScrollIndicator={false}
+      >
         <View className="items-center mt-4 mb-8">
           <View className="h-24 w-24 rounded-full bg-brand-blue items-center justify-center border-4 border-white shadow-sm mb-4">
             <Text className="text-3xl font-extrabold text-white">
@@ -81,6 +87,17 @@ export default function ProfileScreen() {
             </View>
           </View>
         </Card>
+
+        <TouchableOpacity 
+          onPress={() => router.push("/change-password")}
+          className="flex-row items-center justify-center bg-brand-blue/10 py-4 rounded-xl border border-brand-blue/20 mb-3"
+          activeOpacity={0.7}
+        >
+          <Ionicons name="lock-closed-outline" size={20} color="#0A2463" />
+          <Text className="text-navy font-bold text-[15px] ml-2">
+            Reset Password
+          </Text>
+        </TouchableOpacity>
 
         <TouchableOpacity 
           onPress={logout}

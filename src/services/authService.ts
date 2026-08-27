@@ -10,3 +10,11 @@ export async function login(
   });
   return response.data;
 }
+
+export async function changePassword(currentPassword: string, newPassword: string): Promise<{message: string}> {
+  const response = await apiClient.post<{message: string}>("/api/auth/change-password/", {
+    current_password: currentPassword,
+    new_password: newPassword,
+  });
+  return response.data;
+}
